@@ -1,65 +1,82 @@
-🚀 discord-dpi-bypass-linux
+Bu araç, Linux (özellikle Arch Linux tabanlı dağıtımlar) üzerinde Discord'a uygulanan erişim engellerini ve Deep Packet Inspection (DPI) kısıtlamalarını aşmak için geliştirilmiş Python tabanlı bir GUI (Arayüz) uygulamasıdır.
+✨ Öne Çıkan Özellikler
 
-discord-dpi-bypass-linux is an automated DPI Bypass and DNS-over-HTTPS (DoH) solution specifically designed for Linux (optimized for Arch and CachyOS) to overcome Discord access restrictions and connection issues without affecting overall system performance.
-✨ Features
+    Çift Yöntemli Koruma: Hem SpoofDPI (paket manipülasyonu) hem de Cloudflare WARP (VPN tüneli) desteği.
 
-    DPI Bypass: Fragments data packets in a randomized manner to prevent Deep Packet Inspection (DPI) by ISPs, effectively bypassing censorship walls.
+    Otomatik Bağımlılık Kontrolü: Çalıştığı sistemde tk, curl, psmisc gibi paketlerin eksikliğini kontrol eder ve otomatik kurar.
 
-    Secure DNS (DoH): Tunnels DNS queries through HTTPS to prevent DNS poisoning and redirection.
+    Akıllı Patch Mekanizması:
 
-    Automated Dependency Management: The script automatically detects and installs missing system packages like tk, curl, and psmisc.
+        Discord'un settings.json dosyasını güncelleyerek "Host Update" hatalarını engeller.
 
-    Persistent Background Service: Integrates with systemd to create a user-level service that starts automatically on boot.
+        .desktop dosyalarını otomatik yamalayarak Discord'un doğrudan proxy ile başlamasını sağlar.
 
-    Isolated Routing: Instead of slowing down your entire internet connection via a VPN, it selectively tunnels only Discord traffic.
+    Gelişmiş Bypass: CAP_NET_RAW yetkisi ile paket bölme (splitting) ve karıştırma (disorder) gibi ileri seviye DPI bypass tekniklerini uygular.
 
-🛠️ Installation
+    Entegre Test Aracı: Discord bağlantısının durumunu doğrudan arayüz üzerinden test edebilir.
 
-Open your terminal and follow these steps:
+🛠 Teknik Detaylar
 
-    Clone the Repository:
+Uygulama iki farklı strateji sunar:
+
+    SpoofDPI (DPI Bypass):
+
+        Trafiği şifrelemek yerine HTTPS paketlerini parçalayarak ISP'nin (İnternet Servis Sağlayıcı) içeriği okumasını engeller.
+
+        Hız kaybı yaşatmaz, IP adresinizi değiştirmez.
+
+        Systemd servis dosyası oluşturarak arka planda stabil çalışmasını sağlar.
+
+    Cloudflare WARP (VPN Tüneli):
+
+        Bağlantıyı Cloudflare ağı üzerinden tüneller.
+
+        Daha güvenilir bir erişim sağlar.
+
+        AUR üzerinden cloudflare-warp-bin paketini otomatik tespit eder veya kurulumunu başlatır.
+
+🚀 Kurulum ve Çalıştırma
+
+Not: Bu araç Arch Linux tabanlı sistemler için optimize edilmiştir. paru veya yay gibi bir AUR yardımcısının yüklü olması önerilir.
+
+    Depoyu klonlayın:
     Bash
 
-    git clone https://github.com/frkntlr/discord-dpi-bypass-linux.git
-    cd discord-dpi-bypass-linux
+    git clone https://github.com/kullaniciadi/discord-bypass.git
+    cd discord-bypass
 
-    Run the Script:
+    Scripti çalıştırın:
     Bash
 
-    python cachyos_discord_dpi.py
+    python3 main.py
 
-    Use the Interface:
+🖥 Kullanım Rehberi
 
-        Click the "▶ Activate DPI Bypass" button in the window.
+    Bağımlılıklar: Script ilk açılışta gerekli sistem paketlerini kontrol eder. Eğer eksik varsa pkexec (GUI şifre ekranı) ile izin isteyerek kurulumu yapar.
 
-        Once completed, you can launch Discord from your application menu.
+    SpoofDPI: "Aktifleştir" butonuna bastığınızda binary indirilir, servis ayarlanır ve Discord kısayolları proxy ayarlarıyla güncellenir.
 
-📖 Development Story
+    WARP: Eğer SpoofDPI ISP engeline takılıyorsa, WARP bölümünden bağlantı kurarak tam tünel moduna geçebilirsiniz.
 
-This project was born out of frustration with existing Linux solutions (VPNs, complex iptables rules, etc.) that either slowed down the system or broke after every update.
+    Temizleme: "Tümünü Temizle" butonu ile yapılan tüm sistem değişikliklerini, servisleri ve oluşturulan proxy kısayollarını geri alabilirsiniz.
 
-Challenges & Solutions:
+⚠️ Gereksinimler
 
-    DNS Blockades: Since ISPs block standard DNS queries, I implemented a DoH (--dns-mode=https) structure.
+    Python 3.x
 
-    Request Blocked Errors: Aggressive packet splitting often caused Cloudflare to block requests. I fine-tuned the random split mode to find the perfect balance between bypassing DPI and maintaining stable server connections.
+    Arch Linux (veya pacman kullanan bir dağıtım)
 
-    User Experience: To avoid constant terminal usage, I developed a Python-based GUI that handles its own dependencies and system persistence.
+    Sudo/Polkit yetkisi (Servis kurulumu ve paket yönetimi için)
 
-⚠️ Important Notes
+⚖️ Lisans
 
-    Connection Test: The built-in connection test might sometimes show warnings due to tracker filtering. If your Discord app opens and functions correctly, you can safely ignore these logs.
+Bu proje eğitim ve kişisel kullanım amacıyla geliştirilmiştir. Kullanım sorumluluğu kullanıcıya aittir.
+Önemli Geliştirmeler (Versiyon 2.0 İle Gelenler):
 
-    Deactivation: You can revert all changes at any time by clicking the "⏹ Completely Remove" button in the interface.
+    Multi-threading: Arayüzün donmasını engellemek için tüm işlemler arka plan thread'lerinde çalıştırıldı.
 
-👤 Developer
+    Otomatik Yetkilendirme: setcap komutu ile spoofdpi binary'sine root yetkisi olmadan raw socket kullanma yetkisi eklendi.
 
-    Name: Furkan Atalar
+    Kapsamlı Loglama: Hata tespiti için journalctl üzerinden servis logları arayüze entegre edildi.
 
-    Location: Istanbul, Türkiye
-
-    Interests: Software Development, PC Gaming, and Automation
-
-📜 License
-
-This project is licensed under the MIT License. It is intended for educational and personal use only.
+Bu açıklama, kodunun ne kadar sofistike olduğunu ve sadece bir proxy açıp kapatmaktan çok, sistem düzeyinde entegrasyon (Systemd, Desktop Files, JSON Config) yaptığını güzelce vurgulayacaktır. Başka bir detay eklememi ister misin?
